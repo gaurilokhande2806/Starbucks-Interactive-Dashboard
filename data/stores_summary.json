@@ -1,0 +1,400 @@
+{
+  "total_stores": 25248,
+  "countries_count": 73,
+  "cities_count": 5409,
+  "top_ownership_type": "CO",
+  "top_countries": [
+    {
+      "country": "United States",
+      "count": 13311
+    },
+    {
+      "country": "China",
+      "count": 2734
+    },
+    {
+      "country": "Canada",
+      "count": 1415
+    },
+    {
+      "country": "Japan",
+      "count": 1237
+    },
+    {
+      "country": "South Korea",
+      "count": 992
+    },
+    {
+      "country": "United Kingdom",
+      "count": 901
+    },
+    {
+      "country": "Mexico",
+      "count": 579
+    },
+    {
+      "country": "Taiwan",
+      "count": 394
+    },
+    {
+      "country": "Turkey",
+      "count": 326
+    },
+    {
+      "country": "Philippines",
+      "count": 298
+    },
+    {
+      "country": "Thailand",
+      "count": 289
+    },
+    {
+      "country": "Indonesia",
+      "count": 268
+    },
+    {
+      "country": "Malaysia",
+      "count": 234
+    },
+    {
+      "country": "Germany",
+      "count": 160
+    },
+    {
+      "country": "United Arab Emirates",
+      "count": 144
+    },
+    {
+      "country": "France",
+      "count": 132
+    },
+    {
+      "country": "Singapore",
+      "count": 130
+    },
+    {
+      "country": "Russia",
+      "count": 109
+    },
+    {
+      "country": "Argentina",
+      "count": 108
+    },
+    {
+      "country": "Kuwait",
+      "count": 106
+    },
+    {
+      "country": "Saudi Arabia",
+      "count": 102
+    },
+    {
+      "country": "Brazil",
+      "count": 102
+    },
+    {
+      "country": "Spain",
+      "count": 101
+    },
+    {
+      "country": "Chile",
+      "count": 96
+    },
+    {
+      "country": "Peru",
+      "count": 89
+    },
+    {
+      "country": "India",
+      "count": 88
+    },
+    {
+      "country": "Ireland",
+      "count": 73
+    },
+    {
+      "country": "Switzerland",
+      "count": 61
+    },
+    {
+      "country": "Netherlands",
+      "count": 59
+    },
+    {
+      "country": "Poland",
+      "count": 53
+    },
+    {
+      "country": "Egypt",
+      "count": 31
+    },
+    {
+      "country": "Lebanon",
+      "count": 29
+    },
+    {
+      "country": "Czech Republic",
+      "count": 28
+    },
+    {
+      "country": "Greece",
+      "count": 28
+    },
+    {
+      "country": "Romania",
+      "count": 27
+    },
+    {
+      "country": "Vietnam",
+      "count": 25
+    },
+    {
+      "country": "New Zealand",
+      "count": 24
+    },
+    {
+      "country": "Puerto Rico",
+      "count": 23
+    },
+    {
+      "country": "Australia",
+      "count": 22
+    },
+    {
+      "country": "Denmark",
+      "count": 21
+    },
+    {
+      "country": "Bahrain",
+      "count": 21
+    },
+    {
+      "country": "Belgium",
+      "count": 19
+    },
+    {
+      "country": "Sweden",
+      "count": 18
+    },
+    {
+      "country": "Austria",
+      "count": 18
+    },
+    {
+      "country": "Qatar",
+      "count": 18
+    },
+    {
+      "country": "Jordan",
+      "count": 17
+    },
+    {
+      "country": "Norway",
+      "count": 17
+    },
+    {
+      "country": "Hungary",
+      "count": 16
+    },
+    {
+      "country": "Oman",
+      "count": 12
+    },
+    {
+      "country": "Portugal",
+      "count": 11
+    },
+    {
+      "country": "Costa Rica",
+      "count": 11
+    },
+    {
+      "country": "Colombia",
+      "count": 11
+    },
+    {
+      "country": "El Salvador",
+      "count": 11
+    },
+    {
+      "country": "Bahamas",
+      "count": 10
+    },
+    {
+      "country": "Cyprus",
+      "count": 10
+    },
+    {
+      "country": "Morocco",
+      "count": 9
+    },
+    {
+      "country": "Finland",
+      "count": 8
+    },
+    {
+      "country": "KZ",
+      "count": 8
+    },
+    {
+      "country": "Guatemala",
+      "count": 7
+    },
+    {
+      "country": "Bulgaria",
+      "count": 5
+    },
+    {
+      "country": "Brunei",
+      "count": 5
+    },
+    {
+      "country": "Panama",
+      "count": 5
+    },
+    {
+      "country": "AZ",
+      "count": 4
+    },
+    {
+      "country": "Bolivia",
+      "count": 4
+    },
+    {
+      "country": "Cambodia",
+      "count": 4
+    },
+    {
+      "country": "Trinidad and Tobago",
+      "count": 3
+    },
+    {
+      "country": "South Africa",
+      "count": 3
+    },
+    {
+      "country": "Curaçao",
+      "count": 3
+    },
+    {
+      "country": "Slovakia",
+      "count": 3
+    },
+    {
+      "country": "Aruba",
+      "count": 3
+    },
+    {
+      "country": "Luxembourg",
+      "count": 2
+    },
+    {
+      "country": "Monaco",
+      "count": 2
+    },
+    {
+      "country": "Andorra",
+      "count": 1
+    }
+  ],
+  "top_cities": [
+    {
+      "city": "上海市",
+      "count": 542
+    },
+    {
+      "city": "Seoul",
+      "count": 242
+    },
+    {
+      "city": "北京市",
+      "count": 234
+    },
+    {
+      "city": "New York",
+      "count": 230
+    },
+    {
+      "city": "London",
+      "count": 215
+    },
+    {
+      "city": "Toronto",
+      "count": 186
+    },
+    {
+      "city": "Mexico City",
+      "count": 180
+    },
+    {
+      "city": "Chicago",
+      "count": 179
+    },
+    {
+      "city": "Las Vegas",
+      "count": 153
+    },
+    {
+      "city": "Houston",
+      "count": 151
+    },
+    {
+      "city": "Seattle",
+      "count": 151
+    },
+    {
+      "city": "Istanbul",
+      "count": 144
+    },
+    {
+      "city": "Vancouver",
+      "count": 140
+    },
+    {
+      "city": "서울",
+      "count": 136
+    },
+    {
+      "city": "San Diego",
+      "count": 134
+    },
+    {
+      "city": "Singapore",
+      "count": 127
+    },
+    {
+      "city": "Taipei City",
+      "count": 126
+    },
+    {
+      "city": "Calgary",
+      "count": 125
+    },
+    {
+      "city": "Los Angeles",
+      "count": 125
+    },
+    {
+      "city": "Jakarta",
+      "count": 123
+    }
+  ],
+  "ownership_types": [
+    {
+      "type": "CO",
+      "count": 11581
+    },
+    {
+      "type": "LS",
+      "count": 9375
+    },
+    {
+      "type": "JV",
+      "count": 3975
+    },
+    {
+      "type": "FR",
+      "count": 317
+    }
+  ]
+}

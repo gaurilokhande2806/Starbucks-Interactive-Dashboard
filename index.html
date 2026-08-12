@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starbucks Interactive BI Dashboard</title>
+  
+  <!-- Font Imports -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body data-theme="dark">
+  <div class="app-container">
+    
+    <!-- Sidebar / Filters Panel -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <svg viewBox="0 0 100 100" class="starbucks-logo">
+            <circle cx="50" cy="50" r="48" fill="#006241"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#ffffff" stroke-width="2"/>
+            <path d="M 50 15 C 33.5 15 20 28.5 20 45 C 20 54 24 62 30.5 67 C 31.5 67.8 32.5 66.8 32 65.5 C 29 57 32.5 48 39 44 C 36 43 34.5 41 34.5 38.5 C 34.5 34 38.5 30.5 43.5 31.5 C 44 26 48 21.5 53 21.5 C 58 21.5 62 26 62.5 31.5 C 67.5 30.5 71.5 34 71.5 38.5 C 71.5 41 70 43 67 44 C 73.5 48 77 57 74 65.5 C 73.5 66.8 74.5 67.8 75.5 67 C 82 62 86 54 86 45 C 86 28.5 72.5 15 50 15 Z" fill="#ffffff"/>
+            <!-- Siren Crown -->
+            <polygon points="50,23 52,29 58,29 53,33 55,39 50,35 45,39 47,33 42,29 48,29" fill="#006241"/>
+            <!-- Face details -->
+            <path d="M 45 42 Q 50 48 55 42 C 55 42 54 44 50 44 C 46 44 45 42 45 42 Z" fill="#006241"/>
+            <circle cx="47" cy="40" r="1" fill="#006241"/>
+            <circle cx="53" cy="40" r="1" fill="#006241"/>
+            <path d="M 48 37 Q 50 36 52 37" stroke="#006241" stroke-width="1.2" fill="none"/>
+          </svg>
+        </div>
+        <div class="header-titles">
+          <h1>Starbucks Analytics</h1>
+          <span>BI & Insights Platform</span>
+        </div>
+      </div>
+      
+      <!-- Tab Selection -->
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="beverages">
+          <i data-lucide="coffee"></i>
+          <span>Beverage Nutrition</span>
+        </button>
+        <button class="nav-btn" data-tab="stores">
+          <i data-lucide="map-pin"></i>
+          <span>Global Stores</span>
+        </button>
+        <button class="nav-btn" data-tab="builder">
+          <i data-lucide="sparkles"></i>
+          <span>Custom Drink Builder</span>
+        </button>
+      </nav>
+      
+      <!-- Filters Section -->
+      <div class="filters-container">
+        <div class="filters-header">
+          <h3>Interactive Slicers</h3>
+          <button id="btn-reset-filters" title="Reset all filters">
+            <i data-lucide="rotate-ccw"></i>
+          </button>
+        </div>
+        
+        <!-- Global Search -->
+        <div class="filter-group">
+          <label for="search-input">Global Search</label>
+          <div class="search-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="search-input" placeholder="Search drinks or cities...">
+          </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group" id="filter-category-group">
+          <label>Beverage Category</label>
+          <div class="custom-select-container">
+            <button class="select-trigger" id="category-trigger">
+              <span class="trigger-text">All Categories</span>
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="select-dropdown" id="category-dropdown">
+              <div class="dropdown-search">
+                <input type="text" id="category-search" placeholder="Search categories...">
+              </div>
+              <div class="dropdown-options" id="category-options">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preparation / Size Filter -->
+        <div class="filter-group" id="filter-prep-group">
+          <label>Preparation / Milk Type</label>
+          <div class="custom-select-container">
+            <button class="select-trigger" id="prep-trigger">
+              <span class="trigger-text">All Preps</span>
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="select-dropdown" id="prep-dropdown">
+              <div class="dropdown-options" id="prep-options">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Country Filter (Only visible when Global Stores is active) -->
+        <div class="filter-group hidden" id="filter-country-group">
+          <label>Country / Region</label>
+          <div class="custom-select-container">
+            <button class="select-trigger" id="country-trigger">
+              <span class="trigger-text">All Countries</span>
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="select-dropdown" id="country-dropdown">
+              <div class="dropdown-search">
+                <input type="text" id="country-search" placeholder="Search countries...">
+              </div>
+              <div class="dropdown-options" id="country-options">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slider Filters (Beverage Tab Only) -->
+        <div class="slider-filters-container" id="beverage-sliders">
+          <!-- Calories Slider -->
+          <div class="filter-group">
+            <div class="slider-header">
+              <label for="slider-calories">Calories (kcal)</label>
+              <span class="slider-val" id="val-calories">0 - 500+</span>
+            </div>
+            <div class="double-slider-wrapper">
+              <input type="range" id="slider-calories" min="0" max="500" value="500" class="styled-slider">
+            </div>
+          </div>
+
+          <!-- Sugars Slider -->
+          <div class="filter-group">
+            <div class="slider-header">
+              <label for="slider-sugar">Sugars (g)</label>
+              <span class="slider-val" id="val-sugar">0 - 100+</span>
+            </div>
+            <div class="double-slider-wrapper">
+              <input type="range" id="slider-sugar" min="0" max="100" value="100" class="styled-slider">
+            </div>
+          </div>
+
+          <!-- Caffeine Slider -->
+          <div class="filter-group">
+            <div class="slider-header">
+              <label for="slider-caffeine">Caffeine (mg)</label>
+              <span class="slider-val" id="val-caffeine">0 - 450+</span>
+            </div>
+            <div class="double-slider-wrapper">
+              <input type="range" id="slider-caffeine" min="0" max="450" value="450" class="styled-slider">
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Footer details -->
+      <div class="sidebar-footer">
+        <p>&copy; 2026 Starbucks BI</p>
+        <span>Data sources: Kaggle & GitHub</span>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="main-header">
+        <div class="header-left">
+          <h2 id="current-tab-title">Beverage Nutrition Dashboard</h2>
+          <p id="current-tab-subtitle">Analyzing macro-nutrients and beverage category distributions</p>
+        </div>
+        <div class="header-right">
+          <div class="dashboard-stats-summary" id="quick-counter-pill">
+            <span class="pulse-dot"></span>
+            <span id="quick-count-text">242 Drinks Filtered</span>
+          </div>
+          <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+            <i data-lucide="sun" class="sun-icon"></i>
+            <i data-lucide="moon" class="moon-icon"></i>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Tab: Beverage Nutrition -->
+      <div class="tab-panel active" id="panel-beverages">
+        <!-- KPI Cards Grid -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-green">
+              <i data-lucide="cup-soda"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Beverage Variants</span>
+              <h3 class="kpi-value" id="kpi-bev-variants">0</h3>
+              <span class="kpi-trend trend-neutral">Total menu combinations</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-orange">
+              <i data-lucide="flame"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Average Calories</span>
+              <h3 class="kpi-value" id="kpi-avg-calories">0 <span class="unit">kcal</span></h3>
+              <span class="kpi-trend trend-down" id="trend-avg-calories">Avg of filtered beverages</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-red">
+              <i data-lucide="candy"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Average Sugars</span>
+              <h3 class="kpi-value" id="kpi-avg-sugars">0 <span class="unit">g</span></h3>
+              <span class="kpi-trend trend-neutral" id="trend-avg-sugars">Avg of filtered beverages</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-blue">
+              <i data-lucide="zap"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Average Caffeine</span>
+              <h3 class="kpi-value" id="kpi-avg-caffeine">0 <span class="unit">mg</span></h3>
+              <span class="kpi-trend trend-up" id="trend-avg-caffeine">Avg of filtered beverages</span>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Charts Grid 2x2 -->
+        <section class="dashboard-grid">
+          <!-- Avg Calories by Category -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Average Calories by Category</h4>
+              <i data-lucide="bar-chart-2"></i>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-avg-calories"></canvas>
+            </div>
+          </div>
+
+          <!-- Top 5 Caffeine drinks -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Top 5 Highest Caffeine Beverages</h4>
+              <i data-lucide="award"></i>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-top-caffeine"></canvas>
+            </div>
+          </div>
+
+          <!-- Category Distribution -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Beverage Category Distribution</h4>
+              <i data-lucide="pie-chart"></i>
+            </div>
+            <div class="chart-container donut-layout">
+              <canvas id="chart-cat-distribution"></canvas>
+            </div>
+          </div>
+
+          <!-- Sugar vs Calories scatter plot -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Sugar vs. Calories Correlation</h4>
+              <i data-lucide="scatter-chart"></i>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-sugar-scatter"></canvas>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Data Table Section -->
+        <section class="table-card">
+          <div class="table-card-header">
+            <div class="table-header-left">
+              <h4>Beverage Explorer</h4>
+              <span>Interactive granular data records</span>
+            </div>
+            <div class="table-header-actions">
+              <div class="table-search-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" id="table-bev-search" placeholder="Search in table...">
+              </div>
+              <div class="page-size-selector">
+                <label for="bev-page-size">Show:</label>
+                <select id="bev-page-size">
+                  <option value="5">5 rows</option>
+                  <option value="10" selected>10 rows</option>
+                  <option value="25">25 rows</option>
+                  <option value="50">50 rows</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table id="table-beverages-list">
+              <thead>
+                <tr>
+                  <th data-sort="category">Category <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="name">Beverage <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="prep">Preparation <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="calories">Calories (kcal) <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="sugar_g">Sugars (g) <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="caffeine_mg">Caffeine (mg) <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="protein_g">Protein (g) <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                </tr>
+              </thead>
+              <tbody id="bev-table-body">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div class="table-pagination">
+            <span class="pagination-info" id="bev-pagination-info">Showing 0-0 of 0 items</span>
+            <div class="pagination-controls" id="bev-pagination-controls">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Tab: Global Presence -->
+      <div class="tab-panel" id="panel-stores">
+        <!-- KPI Cards Grid -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-green">
+              <i data-lucide="store"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Total Store Locations</span>
+              <h3 class="kpi-value" id="kpi-store-count">0</h3>
+              <span class="kpi-trend trend-neutral" id="trend-store-count">Global stores count</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-blue">
+              <i data-lucide="globe"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Countries Represented</span>
+              <h3 class="kpi-value" id="kpi-store-countries">0</h3>
+              <span class="kpi-trend trend-neutral">Unique nations</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-orange">
+              <i data-lucide="navigation"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Cities Represented</span>
+              <h3 class="kpi-value" id="kpi-store-cities">0</h3>
+              <span class="kpi-trend trend-neutral">Global municipalities</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-container circle-red">
+              <i data-lucide="landmark"></i>
+            </div>
+            <div class="kpi-data">
+              <span class="kpi-label">Primary Ownership</span>
+              <h3 class="kpi-value" id="kpi-store-ownership">N/A</h3>
+              <span class="kpi-trend trend-up">Most frequent business type</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Leaflet Map Section -->
+        <section class="map-card">
+          <div class="chart-card-header">
+            <div class="map-header-text">
+              <h4>Global Store Distribution Map</h4>
+              <span>Drill down into locations or zoom to filter. Circular markers are proportional to densities.</span>
+            </div>
+            <div class="map-actions">
+              <button class="map-btn" id="map-fit-world" title="Fit to all stores">
+                <i data-lucide="expand"></i>
+                <span>Fit World</span>
+              </button>
+            </div>
+          </div>
+          <div class="map-wrapper">
+            <div id="map"></div>
+            <!-- Dynamic map overlay loaded state -->
+            <div class="map-loading-overlay" id="map-loader">
+              <div class="spinner"></div>
+              <span>Loading 25,000+ store coordinates...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts Grid 1x2 -->
+        <section class="dashboard-grid grid-1-2">
+          <!-- Top Countries by Store Count -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Top Countries by Store Count</h4>
+              <i data-lucide="bar-chart-3"></i>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-top-countries"></canvas>
+            </div>
+          </div>
+
+          <!-- Store Ownership Type Distribution -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Store Ownership Type Distribution</h4>
+              <i data-lucide="pie-chart"></i>
+            </div>
+            <div class="chart-container donut-layout">
+              <canvas id="chart-store-ownership"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Store Data Table -->
+        <section class="table-card">
+          <div class="table-card-header">
+            <div class="table-header-left">
+              <h4>Store Locations Explorer</h4>
+              <span>Searchable directory of global cafes</span>
+            </div>
+            <div class="table-header-actions">
+              <div class="table-search-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" id="table-store-search" placeholder="Search store, city or address...">
+              </div>
+              <div class="page-size-selector">
+                <label for="store-page-size">Show:</label>
+                <select id="store-page-size">
+                  <option value="5">5 rows</option>
+                  <option value="10" selected>10 rows</option>
+                  <option value="25">25 rows</option>
+                  <option value="50">50 rows</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table id="table-stores-list">
+              <thead>
+                <tr>
+                  <th data-sort="0">Name <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="1">City <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="2">Country <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="3">Ownership Type <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="4">Latitude <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                  <th data-sort="5">Longitude <i data-lucide="arrow-up-down" class="sort-icon"></i></th>
+                </tr>
+              </thead>
+              <tbody id="store-table-body">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+          <div class="table-pagination">
+            <span class="pagination-info" id="store-pagination-info">Showing 0-0 of 0 items</span>
+            <div class="pagination-controls" id="store-pagination-controls">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tab: Custom Drink Builder -->
+      <div class="tab-panel" id="panel-builder">
+        <section class="builder-layout">
+          <!-- Customizer Panel -->
+          <div class="builder-card customizer-panel">
+            <div class="builder-card-header">
+              <h3>Configure Your Beverage</h3>
+              <p>Select components and toppings to calculate nutrition facts</p>
+            </div>
+            
+            <div class="builder-form-group">
+              <label for="builder-category">1. Base Beverage Category</label>
+              <select id="builder-category" class="builder-select">
+                <option value="">-- Choose Category --</option>
+                <!-- Dynamically Populated -->
+              </select>
+            </div>
+
+            <div class="builder-form-group">
+              <label for="builder-beverage">2. Beverage Base Drink</label>
+              <select id="builder-beverage" class="builder-select" disabled>
+                <option value="">-- Select Category First --</option>
+              </select>
+            </div>
+
+            <div class="builder-form-group">
+              <label for="builder-prep">3. Size / Milk preparation</label>
+              <select id="builder-prep" class="builder-select" disabled>
+                <option value="">-- Select Drink First --</option>
+              </select>
+            </div>
+
+            <div class="builder-form-group">
+              <label>4. Additions & Custom Modifications</label>
+              <div class="addons-list">
+                <label class="addon-checkbox-label">
+                  <input type="checkbox" id="addon-shot" class="addon-checkbox" value="shot">
+                  <div class="addon-custom-chk"></div>
+                  <div class="addon-text">
+                    <span class="addon-title">Extra Espresso Shot</span>
+                    <span class="addon-desc">+5 kcal | +75mg Caffeine</span>
+                  </div>
+                </label>
+
+                <label class="addon-checkbox-label">
+                  <input type="checkbox" id="addon-whip" class="addon-checkbox" value="whip">
+                  <div class="addon-custom-chk"></div>
+                  <div class="addon-text">
+                    <span class="addon-title">Whipped Cream Topping</span>
+                    <span class="addon-desc">+110 kcal | +11g Fat | +1g Sugar</span>
+                  </div>
+                </label>
+
+                <label class="addon-checkbox-label">
+                  <input type="checkbox" id="addon-vanilla" class="addon-checkbox" value="vanilla">
+                  <div class="addon-custom-chk"></div>
+                  <div class="addon-text">
+                    <span class="addon-title">Vanilla Syrup Pump (x2)</span>
+                    <span class="addon-desc">+40 kcal | +10g Sugar</span>
+                  </div>
+                </label>
+
+                <label class="addon-checkbox-label">
+                  <input type="checkbox" id="addon-caramel" class="addon-checkbox" value="caramel">
+                  <div class="addon-custom-chk"></div>
+                  <div class="addon-text">
+                    <span class="addon-title">Caramel Drizzle</span>
+                    <span class="addon-desc">+30 kcal | +2g Fat | +5g Sugar</span>
+                  </div>
+                </label>
+                
+                <label class="addon-checkbox-label">
+                  <input type="checkbox" id="addon-protein" class="addon-checkbox" value="protein">
+                  <div class="addon-custom-chk"></div>
+                  <div class="addon-text">
+                    <span class="addon-title">Scoop Protein Powder</span>
+                    <span class="addon-desc">+45 kcal | +1g Sugar | +9g Protein</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <button id="builder-reset-btn" class="builder-btn-reset">
+              <i data-lucide="refresh-cw"></i> Reset Custom Drink
+            </button>
+          </div>
+
+          <!-- FDA Nutrition Label Panel -->
+          <div class="builder-card nutrition-panel-container">
+            <!-- Nutrition Label Card -->
+            <div class="nutrition-facts-label">
+              <div class="nf-header">
+                <h2>Nutrition Facts</h2>
+                <div class="nf-servings" id="nf-drink-display-name">Select a Beverage</div>
+                <div class="nf-servings-size" id="nf-prep-display-name">Customize sizes & milk</div>
+              </div>
+              <div class="nf-bar nf-bar-heavy"></div>
+              <div class="nf-row nf-calories-row">
+                <div>
+                  <strong>Amount Per Serving</strong>
+                  <div class="nf-calories-title">Calories</div>
+                </div>
+                <div class="nf-calories-value" id="nf-calories">0</div>
+              </div>
+              <div class="nf-bar nf-bar-medium"></div>
+              <div class="nf-row nf-dv-header">
+                <strong>% Daily Value *</strong>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+              
+              <div class="nf-row nf-sub-row">
+                <div><strong>Total Fat</strong> <span id="nf-fat">0.0g</span></div>
+                <div class="nf-pct" id="nf-fat-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+              
+              <div class="nf-row nf-sub-row-2">
+                <div>Saturated Fat <span id="nf-satfat">0.0g</span></div>
+                <div class="nf-pct" id="nf-satfat-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+              
+              <div class="nf-row nf-sub-row-2">
+                <div>Trans Fat <span id="nf-transfat">0.0g</span></div>
+                <div class="nf-pct">—</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+
+              <div class="nf-row nf-sub-row">
+                <div><strong>Cholesterol</strong> <span id="nf-cholesterol">0mg</span></div>
+                <div class="nf-pct" id="nf-cholesterol-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+
+              <div class="nf-row nf-sub-row">
+                <div><strong>Sodium</strong> <span id="nf-sodium">0mg</span></div>
+                <div class="nf-pct" id="nf-sodium-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+
+              <div class="nf-row nf-sub-row">
+                <div><strong>Total Carbohydrate</strong> <span id="nf-carbs">0g</span></div>
+                <div class="nf-pct" id="nf-carbs-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+
+              <div class="nf-row nf-sub-row-2">
+                <div>Dietary Fiber <span id="nf-fiber">0g</span></div>
+                <div class="nf-pct" id="nf-fiber-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-thin"></div>
+
+              <div class="nf-row nf-sub-row-2">
+                <div>Total Sugars <span id="nf-sugar">0g</span></div>
+                <div class="nf-pct">—</div>
+              </div>
+              <div class="nf-bar nf-bar-heavy"></div>
+
+              <div class="nf-row nf-sub-row">
+                <div><strong>Protein</strong> <span id="nf-protein">0.0g</span></div>
+                <div class="nf-pct" id="nf-protein-dv">0%</div>
+              </div>
+              <div class="nf-bar nf-bar-medium"></div>
+
+              <!-- Vitamins & Caffeine Grid -->
+              <div class="nf-vitamin-grid">
+                <div class="nf-vitamin-cell">Vitamin A <span id="nf-vit-a">0%</span></div>
+                <div class="nf-vitamin-cell">Vitamin C <span id="nf-vit-c">0%</span></div>
+                <div class="nf-vitamin-cell">Calcium <span id="nf-calcium">0%</span></div>
+                <div class="nf-vitamin-cell">Iron <span id="nf-iron">0%</span></div>
+              </div>
+              
+              <div class="nf-bar nf-bar-thin"></div>
+              <div class="nf-row nf-sub-row nf-caffeine-row">
+                <div><strong>Caffeine</strong></div>
+                <div class="nf-caffeine-value" id="nf-caffeine">0 mg</div>
+              </div>
+              
+              <div class="nf-footer">
+                * Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.
+              </div>
+            </div>
+            
+            <!-- Health Rating & Indicators -->
+            <div class="health-ratings-card">
+              <h4>Health & RDI Analysis</h4>
+              
+              <div class="health-grade-section">
+                <div class="health-badge" id="nf-health-grade">A</div>
+                <div class="health-badge-desc">
+                  <h5>Nutritional Grade</h5>
+                  <p id="nf-health-desc">Based on sugars, calories, saturated fat, and caffeine metrics.</p>
+                </div>
+              </div>
+              
+              <div class="rdi-bars-container">
+                <!-- Calories -->
+                <div class="rdi-bar-item">
+                  <div class="rdi-labels">
+                    <span>Calories</span>
+                    <span id="rdi-pct-calories">0% of RDI</span>
+                  </div>
+                  <div class="rdi-progress-track">
+                    <div class="rdi-progress-bar bar-calories" id="rdi-bar-calories" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <!-- Sugar -->
+                <div class="rdi-bar-item">
+                  <div class="rdi-labels">
+                    <span>Sugar (Free Sugars)</span>
+                    <span id="rdi-pct-sugar">0% of RDI</span>
+                  </div>
+                  <div class="rdi-progress-track">
+                    <div class="rdi-progress-bar bar-sugar" id="rdi-bar-sugar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <!-- Caffeine -->
+                <div class="rdi-bar-item">
+                  <div class="rdi-labels">
+                    <span>Caffeine (Daily Limit)</span>
+                    <span id="rdi-pct-caffeine">0% of Limit</span>
+                  </div>
+                  <div class="rdi-progress-track">
+                    <div class="rdi-progress-bar bar-caffeine" id="rdi-bar-caffeine" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="fact-bubble" id="builder-fact-bubble">
+                <i data-lucide="info" class="bubble-icon"></i>
+                <p id="builder-fact-text">Select a base drink and explore nutritional metrics relative to recommended daily values.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+    </main>
+  </div>
+  
+  <!-- JavaScript Code -->
+  <script src="app.js"></script>
+</body>
+</html>
